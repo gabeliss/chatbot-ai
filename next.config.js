@@ -7,9 +7,6 @@ const nextConfig = {
       'supabase.co',
     ],
   },
-  experimental: {
-    serverActions: true,
-  },
 }
 
 module.exports = nextConfig
