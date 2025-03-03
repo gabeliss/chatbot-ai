@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { CreateBotForm } from '@/components/bots/CreateBotForm'
+import { SourceUpload } from '@/components/sources/SourceUpload'
+import { SourcesList } from '@/components/sources/SourcesList'
 import { Modal } from '@/components/ui/Modal'
 import { useEffect, useState, useCallback } from 'react'
 
@@ -16,6 +18,7 @@ export default function DashboardPage() {
     isOpen: false,
     botId: null,
   })
+  const [sourcesKey, setSourcesKey] = useState(0)
 
   const fetchBots = useCallback(async () => {
     if (!userId) return
@@ -26,6 +29,10 @@ export default function DashboardPage() {
       .order('created_at', { ascending: false })
     setBots(data || [])
   }, [userId, supabase])
+
+  const refreshSources = useCallback(() => {
+    setSourcesKey(prev => prev + 1)
+  }, [])
 
   useEffect(() => {
     const checkUser = async () => {
@@ -99,43 +106,61 @@ export default function DashboardPage() {
         </div>
 
         {bots.length > 0 && (
-          <div className="bg-card rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-border">
-              <h2 className="text-lg font-medium text-foreground">Your Bots</h2>
-            </div>
-            <ul className="divide-y divide-border">
+          <>
+            <div className="bg-card rounded-lg shadow p-6">
+              <h2 className="text-lg font-medium text-foreground mb-4">Upload Knowledge Sources</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Upload documents to train your bot. Supported formats: PDF, TXT, Markdown.
+              </p>
               {bots.map((bot) => (
-                <li key={bot.id} className="px-6 py-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-sm font-medium text-foreground">{bot.name}</h3>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        Created on {new Date(bot.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          bot.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {bot.is_active ? 'Active' : 'Inactive'}
-                      </span>
-                      <button
-                        onClick={() => handleDeleteBot(bot.id)}
-                        disabled={deleteLoading === bot.id}
-                        className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
-                      >
-                        {deleteLoading === bot.id ? 'Deleting...' : 'Delete'}
-                      </button>
-                    </div>
+                <div key={bot.id} className="mb-8 last:mb-0">
+                  <h3 className="text-sm font-medium text-foreground mb-2">{bot.name}</h3>
+                  <div className="space-y-6">
+                    <SourceUpload botId={bot.id} onUploadComplete={refreshSources} />
+                    <SourcesList key={sourcesKey} botId={bot.id} onSourceDeleted={refreshSources} />
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
-          </div>
+            </div>
+
+            <div className="bg-card rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 border-b border-border">
+                <h2 className="text-lg font-medium text-foreground">Your Bots</h2>
+              </div>
+              <ul className="divide-y divide-border">
+                {bots.map((bot) => (
+                  <li key={bot.id} className="px-6 py-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-medium text-foreground">{bot.name}</h3>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Created on {new Date(bot.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            bot.is_active
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {bot.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                        <button
+                          onClick={() => handleDeleteBot(bot.id)}
+                          disabled={deleteLoading === bot.id}
+                          className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+                        >
+                          {deleteLoading === bot.id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
         )}
 
         <Modal
