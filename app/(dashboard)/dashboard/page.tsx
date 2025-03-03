@@ -7,6 +7,7 @@ import { SourceUpload } from '@/components/sources/SourceUpload'
 import { SourcesList } from '@/components/sources/SourcesList'
 import { Modal } from '@/components/ui/Modal'
 import { useEffect, useState, useCallback } from 'react'
+import { ChatTest } from '@/components/bots/ChatTest'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -118,6 +119,10 @@ export default function DashboardPage() {
                   <div className="space-y-6">
                     <SourceUpload botId={bot.id} onUploadComplete={refreshSources} />
                     <SourcesList key={sourcesKey} botId={bot.id} onSourceDeleted={refreshSources} />
+                    <div className="border-t pt-6">
+                      <h4 className="text-sm font-medium text-foreground mb-4">Test Your Bot</h4>
+                      <ChatTest botId={bot.id} />
+                    </div>
                   </div>
                 </div>
               ))}

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 interface SourceUploadProps {
   botId: string
@@ -93,23 +92,25 @@ export function SourceUpload({ botId, onUploadComplete }: SourceUploadProps) {
           <label className="block text-sm font-medium text-foreground mb-2">
             Upload Knowledge Sources
           </label>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            multiple
-            accept=".pdf,.txt,.md,text/plain,application/pdf,text/markdown"
-            className="block w-full text-sm text-muted-foreground
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0
-              file:text-sm file:font-semibold
-              file:bg-primary file:text-primary-foreground
-              file:cursor-pointer file:hover:opacity-90
-              disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={loading}
-          />
-          <p className="mt-1 text-sm text-muted-foreground">
-            Supported formats: PDF, TXT, Markdown
-          </p>
+          <div className="space-y-2">
+            <input
+              type="file"
+              onChange={handleFileChange}
+              multiple
+              accept=".pdf,.txt,.md,text/plain,application/pdf,text/markdown"
+              className="block w-full text-sm text-muted-foreground
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-sm file:font-semibold
+                file:bg-primary file:text-primary-foreground
+                file:cursor-pointer file:hover:opacity-90
+                disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
+            />
+            <p className="text-sm text-muted-foreground">
+              Supported formats: PDF, TXT, Markdown
+            </p>
+          </div>
         </div>
 
         {files && files.length > 0 && (
@@ -124,18 +125,6 @@ export function SourceUpload({ botId, onUploadComplete }: SourceUploadProps) {
           </div>
         )}
 
-        {error && (
-          <div className="rounded-md bg-destructive/10 p-4">
-            <p className="text-sm text-destructive">{error}</p>
-          </div>
-        )}
-
-        {progress && (
-          <div className="rounded-md bg-green-50 p-4">
-            <p className="text-sm text-green-800">{progress}</p>
-          </div>
-        )}
-
         <button
           type="submit"
           disabled={loading || !files || files.length === 0}
@@ -144,6 +133,18 @@ export function SourceUpload({ botId, onUploadComplete }: SourceUploadProps) {
           {loading ? 'Uploading...' : 'Upload'}
         </button>
       </form>
+
+      {error && (
+        <div className="rounded-md bg-destructive/10 p-4">
+          <p className="text-sm text-destructive">{error}</p>
+        </div>
+      )}
+
+      {progress && (
+        <div className="rounded-md bg-green-50 p-4">
+          <p className="text-sm text-green-800">{progress}</p>
+        </div>
+      )}
     </div>
   )
 } 

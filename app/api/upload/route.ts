@@ -17,8 +17,8 @@ const embeddings = new OpenAIEmbeddings({
 })
 
 // Configure chunk size and overlap for text splitting
-const CHUNK_SIZE = 500
-const CHUNK_OVERLAP = 50
+const CHUNK_SIZE = 1500
+const CHUNK_OVERLAP = 150
 
 export async function POST(request: Request) {
   try {

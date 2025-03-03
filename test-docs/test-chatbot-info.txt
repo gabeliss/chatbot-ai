@@ -1,0 +1,10 @@
+This is a test document about AI chatbots.
+
+Chatbots are computer programs designed to simulate conversation with human users. They use natural language processing (NLP) to understand user input and generate appropriate responses.
+
+Key features of modern chatbots:
+- Natural language understanding
+- Context awareness
+- Personalization
+- Multi-turn conversations
+- Integration with external systems
