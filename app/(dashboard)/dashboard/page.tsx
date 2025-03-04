@@ -8,6 +8,7 @@ import { SourcesList } from '@/components/sources/SourcesList'
 import { Modal } from '@/components/ui/Modal'
 import { useEffect, useState, useCallback } from 'react'
 import { ChatTest } from '@/components/bots/ChatTest'
+import { EmbedCode } from '@/components/bots/EmbedCode'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -122,6 +123,9 @@ export default function DashboardPage() {
                     <div className="border-t pt-6">
                       <h4 className="text-sm font-medium text-foreground mb-4">Test Your Bot</h4>
                       <ChatTest botId={bot.id} />
+                    </div>
+                    <div className="border-t pt-6 mt-6">
+                      <EmbedCode botId={bot.id} />
                     </div>
                   </div>
                 </div>

@@ -23,12 +23,25 @@ const embeddings = new OpenAIEmbeddings({
 
 export async function POST(request: Request) {
   try {
+    // Handle CORS
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+      })
+    }
+
     // Get the current user from Supabase auth
     const supabase = createRouteHandlerClient({ cookies })
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    
+    // For embedded chat, we'll skip auth check
+    // const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // if (authError || !user) {
+    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // }
 
     // Parse request body
     const { botId, question } = await request.json()
@@ -36,17 +49,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing botId or question' }, { status: 400 })
     }
 
-    // Verify the user has access to this bot
-    const { data: bot, error: botError } = await supabase
-      .from('bots')
-      .select('id')
-      .eq('id', botId)
-      .eq('user_id', user.id)
-      .single()
+    // For embedded chat, we'll skip bot ownership check
+    // const { data: bot, error: botError } = await supabase
+    //   .from('bots')
+    //   .select('id')
+    //   .eq('id', botId)
+    //   .eq('user_id', user.id)
+    //   .single()
 
-    if (botError || !bot) {
-      return NextResponse.json({ error: 'Bot not found' }, { status: 404 })
-    }
+    // if (botError || !bot) {
+    //   return NextResponse.json({ error: 'Bot not found' }, { status: 404 })
+    // }
 
     // Get embedding for the question
     const [questionEmbedding] = await embeddings.embedDocuments([question])
@@ -144,7 +157,7 @@ export async function POST(request: Request) {
     })
 
     // Return the answer and sources
-    return NextResponse.json({
+    const response = NextResponse.json({
       answer: completion.choices[0].message.content,
       sources: filteredChunks
         .map((chunk: RelevantChunk) => ({
@@ -154,11 +167,25 @@ export async function POST(request: Request) {
         }))
     })
 
+    // Add CORS headers
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+
+    return response
+
   } catch (error) {
     console.error('Error in ask endpoint:', error)
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: error instanceof Error ? error.message : 'An error occurred' },
       { status: 500 }
     )
+    
+    // Add CORS headers to error response
+    errorResponse.headers.set('Access-Control-Allow-Origin', '*')
+    errorResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    errorResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+
+    return errorResponse
   }
 } 
